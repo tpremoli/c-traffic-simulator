@@ -33,6 +33,58 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
         rightOn = 0;
     }
 
+    unsigned int remainingIterations = 500;
+    unsigned int timeTillLeftFlip = leftTime;
+    unsigned int timeTillRightFlip = rightTime;
+
+    while (remainingIterations != 0 && (leftQueue != 0 || rightQueue != 0))
+    {
+        /* Step 1: Queue on left */
+        if (gsl_ran_flat(r, 0, 1) < leftFlow)
+        {
+            leftQueue = leftQueue + 1;
+        }
+        /* Step 2: Queue on right */
+        if (gsl_ran_flat(r, 0, 1) < rightFlow)
+        {
+            rightQueue = rightQueue + 1;
+        }
+        /* Step 3: Cars move */
+        if (leftOn == 1 && leftQueue != 0)
+        {
+            leftQueue = leftQueue - 1;
+        }
+        if (rightOn == 1 && rightQueue != 0)
+        {
+            rightQueue = rightQueue - 1;
+        }
+
+        /* Step 4: flipping traffic lights if necessary */
+        if (timeTillLeftFlip == 0)
+        {
+            if (leftOn == 1)
+                leftOn = 0;
+            else
+                leftOn = 1;
+            timeTillLeftFlip = leftTime;
+        }
+        else
+            timeTillLeftFlip--;
+
+        if (timeTillRightFlip == 0)
+        {
+            if (rightOn == 1)
+                rightOn = 0;
+            else
+                rightOn = 1;
+            timeTillRightFlip = rightTime;
+        }
+        else
+            timeTillRightFlip--;
+        
+        remainingIterations--;
+    }
+
     return 0;
 }
 
