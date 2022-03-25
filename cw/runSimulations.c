@@ -4,12 +4,8 @@
 
 int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime);
 
-
 int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime)
 {
-    unsigned int leftQueue = 0;
-    unsigned int rightQueue = 0;
-
     const gsl_rng_type *T;
     gsl_rng *r;
     gsl_rng_env_setup();
@@ -18,80 +14,99 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
 
     gsl_rng_set(r, time(0));
 
-    char rightOn;
-    char leftOn;
+    /* Keeping track of simulation parameters */
+    /* Queue Sizes */
+    unsigned int leftQueue = 0;
+    unsigned int rightQueue = 0;
+    /* Which light is green */
+    char rightGreen;
+    char leftGreen;
+    /* How long until light turns red */
+    unsigned int timeTillLeftRed;
+    unsigned int timeTillRightRed;
+    unsigned int remainingIterations = 500;
+
 
     /* Determining which light is on to begin with */
     if (gsl_ran_flat(r, 0, 1) < 0.5)
     {
-        leftOn = 0;
-        rightOn = 1;
+        leftGreen = 0;
+        rightGreen = 1;
+        timeTillLeftRed = -1;
+        timeTillRightRed = rightTime;
     }
     else
     {
-        leftOn = 1;
-        rightOn = 0;
+        leftGreen = 1;
+        rightGreen = 0;
+        timeTillRightRed = -1;
+        timeTillLeftRed = leftTime;
     }
 
-    unsigned int remainingIterations = 500;
-    unsigned int timeTillLeftFlip = leftTime;
-    unsigned int timeTillRightFlip = rightTime;
+    /* Stats for left */
+    unsigned int totalLeftCars = 0;
+    float avgLeftWait = 0;
+    unsigned int maxLeftWait = 0;
+    unsigned int timeToClearLeft = 0;
 
-    while (remainingIterations != 0 && (leftQueue != 0 || rightQueue != 0))
+    /* Stats for right */
+    unsigned int totalRightCars = 0;
+    float avgRightWait = 0;
+    unsigned int maxRightWait = 0;
+    unsigned int timeToClearRight = 0;
+
+    while (remainingIterations != 0 || (leftQueue != 0 || rightQueue != 0))
     {
-        /* Step 1: Queue on left */
-        if (gsl_ran_flat(r, 0, 1) < leftFlow)
-        {
-            leftQueue = leftQueue + 1;
-        }
-        /* Step 2: Queue on right */
-        if (gsl_ran_flat(r, 0, 1) < rightFlow)
-        {
-            rightQueue = rightQueue + 1;
-        }
-        /* Step 3: Cars move */
-        if (leftOn == 1 && leftQueue != 0)
-        {
-            leftQueue = leftQueue - 1;
-        }
-        if (rightOn == 1 && rightQueue != 0)
-        {
-            rightQueue = rightQueue - 1;
+        if(timeTillLeftRed == 0){
+            rightGreen = 1;
+            leftGreen = 0;
+            timeTillRightRed = rightTime;
+            timeTillLeftRed--;
+        }else if(timeTillRightRed == 0){
+            rightGreen = 0;
+            leftGreen = 1;
+            timeTillLeftRed = leftTime;
+            timeTillRightRed--;
+        }else{
+
+            /* Step 1: Queue on left */
+            if (gsl_ran_flat(r, 0, 1) < leftFlow && (remainingIterations != 0))
+            {
+                leftQueue = leftQueue + 1;
+                totalLeftCars = totalLeftCars + 1;
+            }
+            /* Step 2: Queue on right */
+            if (gsl_ran_flat(r, 0, 1) < rightFlow && (remainingIterations != 0))
+            {
+                rightQueue = rightQueue + 1;
+                totalRightCars = totalRightCars + 1;
+            }
+            /* Step 3: Cars move */
+            if (leftGreen == 1 && leftQueue != 0)
+            {
+                leftQueue = leftQueue - 1;
+            }
+            if (rightGreen == 1 && rightQueue != 0)
+            {
+                rightQueue = rightQueue - 1;
+            }
+
+            timeTillRightRed--;
+            timeTillLeftRed--;
+
         }
 
-        /* Step 4: flipping traffic lights if necessary */
-        if (timeTillLeftFlip == 0)
-        {
-            if (leftOn == 1)
-                leftOn = 0;
-            else
-                leftOn = 1;
-            timeTillLeftFlip = leftTime;
-        }
-        else
-            timeTillLeftFlip--;
+        if(remainingIterations != 0)
+            remainingIterations--;
 
-        if (timeTillRightFlip == 0)
-        {
-            if (rightOn == 1)
-                rightOn = 0;
-            else
-                rightOn = 1;
-            timeTillRightFlip = rightTime;
-        }
-        else
-            timeTillRightFlip--;
-        
-        remainingIterations--;
+        printf("remainingiterations: %d. rightGreen = %d. leftGreen = %d. leftQueue = %d, rightQueue = %d\n", remainingIterations, rightGreen, leftGreen, leftQueue, rightQueue);
     }
-
     return 0;
 }
 
 int main()
 {
 
-    printf("hello.txt");
-
+    runOneSimulation(0.9, 0.9, 3, 3);
     return 0;
 }
