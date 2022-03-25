@@ -8,8 +8,17 @@ struct node
 };
 typedef struct node NODE;
 
-extern int enqueue(NODE **root);
-extern int dequeue(NODE **root);
-extern int incrementWaits(NODE *root);
-extern int printWaits(NODE *root);
-extern int countNodes(NODE *root);
+struct queue
+{
+    struct node *firstNode;
+    struct node *lastNode;
+    unsigned int size;
+};
+typedef struct queue QUEUE;
+
+extern int enqueue(QUEUE *queue);
+extern int dequeue(QUEUE *queue);
+extern int incrementWaits(QUEUE *queue);
+extern int printWaits(QUEUE *queue);
+extern QUEUE *initQueue();
+extern NODE *initNode();

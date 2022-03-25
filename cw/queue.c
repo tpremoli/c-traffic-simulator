@@ -1,109 +1,91 @@
 #include <queue.h>
 
-int enqueue(NODE **root)
+int enqueue(QUEUE *queue)
 {
-    NODE *newNode;
-    if ((newNode = (NODE *)malloc(sizeof(NODE))) == NULL)
+    NODE *newNode = initNode();
+
+    if (queue->size == 0)
     {
-        printf("Out of memory!\n");
-        exit(1);
+        queue->firstNode = newNode;
+        queue->lastNode = newNode;
+        queue->size = 1;
     }
     else
     {
-        if ((**root).nextNode == NULL)
-        {
-            printf("Enqueuing first node\n");
-            
-            newNode->waitTime = 0;
-            newNode->nextNode = NULL;
-
-            (**root).nextNode = newNode;
-        }
-        else
-        {
-            NODE *currentNode = (**root).nextNode;
-
-            while (currentNode->nextNode != NULL)
-            {
-                currentNode = currentNode->nextNode;
-            }
-
-            newNode->waitTime = 0;
-            newNode->nextNode = NULL;
-
-            currentNode->nextNode = newNode;
-        }
+        queue->lastNode->nextNode = newNode;
+        queue->lastNode = newNode;
+        queue->size++;
     }
 
     return 0;
 }
 
-int countNodes(NODE *root)
+int dequeue(QUEUE *queue)
 {
-
-    if (root->nextNode  == NULL)
+    /* Special cases if queue is empty or if there's only one elem */
+    if (queue->size == 0)
     {
-        printf("root is null\n");
-        return 0;
+        return 1;
+    }
+    if (queue->size == 1)
+    {
+        unsigned int wait = queue->firstNode->waitTime;
+
+        NODE *removedNode = queue->firstNode;
+
+        /* Empty queue */
+        queue->firstNode = NULL;
+        queue->lastNode = NULL;
+
+        free(removedNode);
+
+        queue->size = 0;
+
+        return wait;
     }
 
-    unsigned int count = 1;
+    unsigned int wait = queue->firstNode->waitTime;
 
-    NODE *currentNode = root->nextNode;
+    NODE *removedNode = queue->firstNode;
 
-    while (currentNode->nextNode != NULL)
-    {
-        currentNode = currentNode->nextNode;
-        count++;
-    }
+    queue->firstNode = queue->firstNode->nextNode;
 
-    return count;
-}
+    free(removedNode);
 
-int dequeue(NODE **root)
-{
-    if ((**root).nextNode  == NULL)
-    {
-        return 0;
-    }
-
-    NODE **removedNode = (**root).nextNode;
-
-    unsigned int wait = (**root).waitTime;
-
-    NODE *newRoot = (**root).nextNode;
-
-    *root = newRoot;
-
-    free(*removedNode);
+    queue->size--;
 
     return wait;
 }
 
-int incrementWaits(NODE *root)
+int incrementWaits(QUEUE *queue)
 {
-    if (root->nextNode  == NULL)
+    if (queue->size == 0)
     {
-        return 0;
+        return 1;
     }
 
-    NODE *currentNode = root->nextNode;
-    currentNode->waitTime = currentNode->waitTime + 1;
+    NODE *currentNode = queue->firstNode;
+    currentNode->waitTime++;
 
     while (currentNode->nextNode != NULL)
     {
         currentNode = currentNode->nextNode;
-        currentNode->waitTime = currentNode->waitTime + 1;
+        currentNode->waitTime++;
     }
 
     return 0;
 }
 
-int printWaits(NODE *root)
+int printWaits(QUEUE *queue)
 {
-    NODE *currentNode = root->nextNode;
+    if (queue->size == 0)
+    {
+        return 1;
+    }
 
-    unsigned int count = 0;
+    NODE *currentNode = queue->firstNode;
+
+    unsigned int count = 1;
 
     while (currentNode->nextNode != NULL)
     {
@@ -113,4 +95,31 @@ int printWaits(NODE *root)
     }
 
     return 0;
+}
+
+QUEUE *initQueue()
+{
+    QUEUE *queue = NULL;
+    if ((queue = (QUEUE *)malloc(sizeof(QUEUE))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    queue->firstNode = NULL;
+    queue->lastNode = NULL;
+    queue->size = 0;
+    return queue;
+}
+
+NODE *initNode()
+{
+    NODE *node = NULL;
+    if ((node = (NODE *)malloc(sizeof(NODE))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    node->nextNode = NULL;
+    node->waitTime = 0;
+    return node;
 }
