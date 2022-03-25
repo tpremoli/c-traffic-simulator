@@ -125,6 +125,12 @@ int main()
         enqueue(root);
         enqueue(root);
         enqueue(root);
+        enqueue(root);
+        enqueue(root);
+
+
+        dequeue(&root);
+
 
         unsigned int count = countNodes(root);
 

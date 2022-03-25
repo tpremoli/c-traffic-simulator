@@ -4,5 +4,5 @@
 #include <gsl/gsl_randist.h>
 #include <queue.h>
 
-int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime);
+extern int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime);
 

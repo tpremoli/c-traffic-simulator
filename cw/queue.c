@@ -22,6 +22,8 @@ int enqueue(NODE *root)
 
         currentNode->nextNode = newNode;
     }
+
+    return 0;
 }
 
 int countNodes(NODE *root)
@@ -39,8 +41,19 @@ int countNodes(NODE *root)
     return count;
 }
 
-int dequeue(NODE *root)
+int dequeue(NODE **root)
 {
+    NODE **removedNode = root;
+
+    unsigned int wait = (**root).waitTime;
+
+    NODE *newRoot = (**root).nextNode;
+
+    *root = newRoot;
+
+    free(*removedNode);
+    
+    return wait;
 }
 
 int incrementWaits(NODE *root)
