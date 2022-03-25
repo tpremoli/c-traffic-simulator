@@ -103,15 +103,25 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
         }
 
         /* Step 4: Are cars done arriving? */
-        if (remainingIterations != 0)
+        if (remainingIterations != 0){
             remainingIterations--;
+        } else{
+            if(rightQueue->size != 0){
+                rightQueue->statistics->timeToClear++;
+            }
+            if(leftQueue->size != 0){
+                leftQueue->statistics->timeToClear++;
+            }
+        }
         
         totalIterations++;
         incrementWaits(leftQueue);
         incrementWaits(rightQueue);
 
-        printf("remainingiterations: %d. rightGreen = %d. leftGreen = %d. leftQueue = %d, rightQueue = %d\n", remainingIterations, rightGreen, leftGreen, leftQueue->size, rightQueue->size);
     }
+
+    printStats(rightQueue);
+    printStats(leftQueue);
 
     printf("Total iterations = %d\n",totalIterations);
     return 0;
