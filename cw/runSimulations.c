@@ -111,6 +111,19 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
 int main()
 {
 
-    runOneSimulation(0.9, 0.9, 3, 3);
+    /* runOneSimulation(0.9, 0.9, 3, 3); */
+
+    NODE *root = NULL;
+
+    if ((root = (NODE *)malloc(sizeof(NODE))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    else
+    {
+        enqueue(root);
+    }
+
     return 0;
 }
