@@ -123,6 +123,12 @@ int main()
     else
     {
         enqueue(root);
+        enqueue(root);
+        enqueue(root);
+
+        unsigned int count = countNodes(root);
+
+        printf("Number of nodes in queue: %d\n",count);
     }
 
     return 0;
