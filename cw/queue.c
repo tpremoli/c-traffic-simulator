@@ -58,4 +58,30 @@ int dequeue(NODE **root)
 
 int incrementWaits(NODE *root)
 {
+    NODE *currentNode = root;
+    currentNode->waitTime = currentNode->waitTime + 1;
+
+    while (currentNode->nextNode != NULL)
+    {
+        currentNode = currentNode->nextNode;
+        currentNode->waitTime = currentNode->waitTime + 1;
+    }
+
+    return 0;
+}
+
+int printWaits(NODE *root)
+{
+    NODE *currentNode = root;
+
+    unsigned int count = 0;
+
+    while (currentNode->nextNode != NULL)
+    {
+        printf("Node %d waited %d\n",count,currentNode->waitTime);
+        currentNode = currentNode->nextNode;
+        count++;
+    }
+
+    return 0;
 }

@@ -131,6 +131,11 @@ int main()
 
         dequeue(&root);
 
+        incrementWaits(root);
+        incrementWaits(root);
+
+        printWaits(root);
+
 
         unsigned int count = countNodes(root);
 
