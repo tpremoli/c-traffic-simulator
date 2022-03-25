@@ -1,8 +1,4 @@
-#include <stdio.h>
-#include <gsl/gsl_rng.h>
-#include <gsl/gsl_randist.h>
-
-int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime);
+#include <runSimulations.h>
 
 int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime)
 {
