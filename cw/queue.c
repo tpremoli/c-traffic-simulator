@@ -1,6 +1,6 @@
 #include <queue.h>
 
-int enqueue(NODE *root)
+int enqueue(NODE **root)
 {
     NODE *newNode;
     if ((newNode = (NODE *)malloc(sizeof(NODE))) == NULL)
@@ -10,17 +10,29 @@ int enqueue(NODE *root)
     }
     else
     {
-        NODE *currentNode = root;
-
-        while (currentNode->nextNode != NULL)
+        if ((**root).nextNode == NULL)
         {
-            currentNode = currentNode->nextNode;
+            printf("Enqueuing first node\n");
+            
+            newNode->waitTime = 0;
+            newNode->nextNode = NULL;
+
+            (**root).nextNode = newNode;
         }
+        else
+        {
+            NODE *currentNode = (**root).nextNode;
 
-        newNode->waitTime = 0;
-        newNode->nextNode = NULL;
+            while (currentNode->nextNode != NULL)
+            {
+                currentNode = currentNode->nextNode;
+            }
 
-        currentNode->nextNode = newNode;
+            newNode->waitTime = 0;
+            newNode->nextNode = NULL;
+
+            currentNode->nextNode = newNode;
+        }
     }
 
     return 0;
@@ -28,9 +40,16 @@ int enqueue(NODE *root)
 
 int countNodes(NODE *root)
 {
-    unsigned int count = 0;
 
-    NODE *currentNode = root;
+    if (root->nextNode  == NULL)
+    {
+        printf("root is null\n");
+        return 0;
+    }
+
+    unsigned int count = 1;
+
+    NODE *currentNode = root->nextNode;
 
     while (currentNode->nextNode != NULL)
     {
@@ -43,7 +62,12 @@ int countNodes(NODE *root)
 
 int dequeue(NODE **root)
 {
-    NODE **removedNode = root;
+    if ((**root).nextNode  == NULL)
+    {
+        return 0;
+    }
+
+    NODE **removedNode = (**root).nextNode;
 
     unsigned int wait = (**root).waitTime;
 
@@ -52,13 +76,18 @@ int dequeue(NODE **root)
     *root = newRoot;
 
     free(*removedNode);
-    
+
     return wait;
 }
 
 int incrementWaits(NODE *root)
 {
-    NODE *currentNode = root;
+    if (root->nextNode  == NULL)
+    {
+        return 0;
+    }
+
+    NODE *currentNode = root->nextNode;
     currentNode->waitTime = currentNode->waitTime + 1;
 
     while (currentNode->nextNode != NULL)
@@ -72,13 +101,13 @@ int incrementWaits(NODE *root)
 
 int printWaits(NODE *root)
 {
-    NODE *currentNode = root;
+    NODE *currentNode = root->nextNode;
 
     unsigned int count = 0;
 
     while (currentNode->nextNode != NULL)
     {
-        printf("Node %d waited %d\n",count,currentNode->waitTime);
+        printf("Node %d waited %d\n", count, currentNode->waitTime);
         currentNode = currentNode->nextNode;
         count++;
     }

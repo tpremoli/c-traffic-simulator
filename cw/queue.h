@@ -8,7 +8,7 @@ struct node
 };
 typedef struct node NODE;
 
-extern int enqueue(NODE *root);
+extern int enqueue(NODE **root);
 extern int dequeue(NODE **root);
 extern int incrementWaits(NODE *root);
 extern int printWaits(NODE *root);

@@ -11,10 +11,21 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
 
     gsl_rng_set(r, time(0));
 
+    /* Initializing each queue */
+    NODE *leftQueue = NULL;
+    if ((leftQueue = (NODE *)malloc(sizeof(NODE))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    NODE *rightQueue = NULL;
+    if ((rightQueue = (NODE *)malloc(sizeof(NODE))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+
     /* Keeping track of simulation parameters */
-    /* Queue Sizes */
-    unsigned int leftQueue = 0;
-    unsigned int rightQueue = 0;
     /* Which light is green */
     char rightGreen;
     char leftGreen;
@@ -51,7 +62,7 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
     unsigned int maxRightWait = 0;
     unsigned int timeToClearRight = 0;
 
-    while (remainingIterations != 0 || (leftQueue != 0 || rightQueue != 0))
+    while (remainingIterations != 0 || (countNodes(leftQueue) != 0 || countNodes(rightQueue) != 0))
     {
         /* Possibility 1: Lights flipping */
         if (timeTillLeftRed == 0)
@@ -74,25 +85,25 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
             /* Step 1: Queue on left */
             if (gsl_ran_flat(r, 0, 1) < leftFlow && (remainingIterations != 0))
             {
-                leftQueue = leftQueue + 1;
+                enqueue(&leftQueue);
                 totalLeftCars = totalLeftCars + 1;
             }
 
             /* Step 2: Queue on right */
             if (gsl_ran_flat(r, 0, 1) < rightFlow && (remainingIterations != 0))
             {
-                rightQueue = rightQueue + 1;
+                enqueue(&rightQueue);
                 totalRightCars = totalRightCars + 1;
             }
 
             /* Step 3: Cars moving */
-            if (leftGreen == 1 && leftQueue != 0)
+            if (leftGreen == 1 && countNodes(leftQueue) != 0)
             {
-                leftQueue = leftQueue - 1;
+                dequeue(&leftQueue);
             }
-            else if (rightGreen == 1 && rightQueue != 0)
+            else if (rightGreen == 1 && countNodes(rightQueue) != 0)
             {
-                rightQueue = rightQueue - 1;
+                dequeue(&rightQueue);
             }
 
             timeTillRightRed--;
@@ -103,16 +114,13 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
         if (remainingIterations != 0)
             remainingIterations--;
 
-        printf("remainingiterations: %d. rightGreen = %d. leftGreen = %d. leftQueue = %d, rightQueue = %d\n", remainingIterations, rightGreen, leftGreen, leftQueue, rightQueue);
+        printf("remainingiterations: %d. rightGreen = %d. leftGreen = %d. leftQueue = %d, rightQueue = %d\n", remainingIterations, rightGreen, leftGreen, countNodes(leftQueue), countNodes(rightQueue));
     }
     return 0;
 }
 
 int main()
 {
-
-    /* runOneSimulation(0.9, 0.9, 3, 3); */
-
     NODE *root = NULL;
 
     if ((root = (NODE *)malloc(sizeof(NODE))) == NULL)
@@ -122,25 +130,20 @@ int main()
     }
     else
     {
-        enqueue(root);
-        enqueue(root);
-        enqueue(root);
-        enqueue(root);
-        enqueue(root);
+        enqueue(&root);
 
+        printf("%d\n", countNodes(root));
 
         dequeue(&root);
 
-        incrementWaits(root);
-        incrementWaits(root);
+        printf("%d\n", countNodes(root));
 
-        printWaits(root);
+        enqueue(&root);
 
-
-        unsigned int count = countNodes(root);
-
-        printf("Number of nodes in queue: %d\n",count);
+        printf("%d\n", countNodes(root));
     }
+
+    /* runOneSimulation(0.9, 0.9, 3, 3); */
 
     return 0;
 }
