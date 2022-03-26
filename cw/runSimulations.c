@@ -24,10 +24,9 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
     unsigned int timeTillLeftRed;
     unsigned int timeTillRightRed;
     unsigned int remainingIterations = 500;
-    unsigned int totalIterations = 1;
 
     /* Determining which light is on to begin with */
-    if (gsl_ran_flat(r, 0, 1) < 0.5)
+    if (gsl_rng_uniform_pos(r) < 0.5)
     {
         leftGreen = 0;
         rightGreen = 1;
@@ -41,18 +40,6 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
         timeTillRightRed = -1;
         timeTillLeftRed = leftTime;
     }
-
-    /* Stats for left */
-    unsigned int totalLeftCars = 0;
-    float avgLeftWait = 0;
-    unsigned int maxLeftWait = 0;
-    unsigned int timeToClearLeft = 0;
-
-    /* Stats for right */
-    unsigned int totalRightCars = 0;
-    float avgRightWait = 0;
-    unsigned int maxRightWait = 0;
-    unsigned int timeToClearRight = 0;
 
     while (remainingIterations != 0 || (leftQueue->size != 0 || rightQueue->size != 0))
     {
@@ -75,17 +62,15 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
         else
         {
             /* Step 1: Queue on left */
-            if (gsl_ran_flat(r, 0, 1) < leftFlow && (remainingIterations != 0))
+            if (gsl_rng_uniform_pos(r) < leftFlow && (remainingIterations != 0))
             {
                 enqueue(leftQueue);
-                totalLeftCars = totalLeftCars + 1;
             }
 
             /* Step 2: Queue on right */
-            if (gsl_ran_flat(r, 0, 1) < rightFlow && (remainingIterations != 0))
+            if (gsl_rng_uniform_pos(r) < rightFlow && (remainingIterations != 0))
             {
                 enqueue(rightQueue);
-                totalRightCars = totalRightCars + 1;
             }
 
             /* Step 3: Cars moving */
@@ -123,7 +108,6 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
         }
 
         /* Incrementing all the time parameters */
-        totalIterations++;
         incrementWaits(leftQueue);
         incrementWaits(rightQueue);
     }
@@ -133,6 +117,9 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
 
     free(rightQueue);
     free(leftQueue);
+    /* printf("%f\n",gsl_rng_uniform_pos(r)); */
+
+    gsl_rng_free(r);
 
     return results;
 }
@@ -146,7 +133,7 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
 
     for (i = 0; i < 100; i++)
     {
-        STATPAIR *currentPair = (STATPAIR *)runOneSimulation(0.5, 0.5, 3, 3);
+        STATPAIR *currentPair = (STATPAIR *)runOneSimulation(leftFlow, rightFlow, leftTime, rightTime);
 
         avgLeft->totalVehicles += currentPair->left->totalVehicles;
         avgLeft->totalWait += currentPair->left->totalWait;
@@ -198,7 +185,7 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
 
 int main()
 {
-    runSimulations(0.5, 0.5, 3, 3);
+    runSimulations(0.15, 0.95, 2, 12);
 
     return 0;
 }

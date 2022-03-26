@@ -5,4 +5,4 @@
 #include <queue.h>
 
 extern STATPAIR* runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime);
-
+extern int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime);
