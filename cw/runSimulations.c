@@ -137,20 +137,23 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
     return results;
 }
 
-int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime){
+int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
+{
     int i;
 
     STATS *avgLeft = initStats();
     STATS *avgRight = initStats();
 
-    for(i = 0; i<100; i++){
+    for (i = 0; i < 100; i++)
+    {
         STATPAIR *currentPair = (STATPAIR *)runOneSimulation(0.5, 0.5, 3, 3);
 
         avgLeft->totalVehicles += currentPair->left->totalVehicles;
         avgLeft->totalWait += currentPair->left->totalWait;
         avgLeft->timeToClear += currentPair->left->timeToClear;
-        if(currentPair->left->maxWait > avgLeft->maxWait){
-            avgLeft->timeToClear = currentPair->left->maxWait;
+        if (currentPair->left->maxWait > avgLeft->maxWait)
+        {
+            avgLeft->maxWait = currentPair->left->maxWait;
         }
 
         free(currentPair->left);
@@ -158,8 +161,9 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
         avgRight->totalVehicles += currentPair->right->totalVehicles;
         avgRight->totalWait += currentPair->right->totalWait;
         avgRight->timeToClear += currentPair->right->timeToClear;
-        if(currentPair->right->maxWait > avgRight->maxWait){
-            avgRight->timeToClear = currentPair->right->maxWait;
+        if (currentPair->right->maxWait > avgRight->maxWait)
+        {
+            avgRight->maxWait = currentPair->right->maxWait;
         }
 
         free(currentPair->right);
@@ -167,36 +171,34 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
         free(currentPair);
     }
 
-    printf(
-        "Parameter values:\n
-            from left:\n
-                traffic arrival rate: %.3f\n
-                traffic light period: %3d\n
-            from right:\n
-                traffic arrival rate: %.3f\n
-                traffic light period: %3d\n
-        Results (Averaged over 100 runs):\n
-            from left:\n
-                number of vehicles: %.3f\n
-                average waiting time: %.3f\n
-                maximum waiting time: %d\n
-                clearance time: %.3f\n
-            from right:\n
-                number of vehicles: %.3f\n
-                average waiting time: %.3f\n
-                maximum waiting time: %d\n
-                clearance time: %.3f\n
-                ",
-                
-    )
+    printf("Parameter values:\n");
+    printf("\tfrom left:\n");
+    printf("\t\ttraffic arrival rate: %.2f\n", leftFlow);
+    printf("\t\ttraffic light period: %03d\n", leftTime);
+    printf("\tfrom left:\n");
+    printf("\t\ttraffic arrival rate: %.2f\n", rightFlow);
+    printf("\t\ttraffic light period: %03d\n", rightTime);
+    printf("Results (Averaged over 100 runs):\n");
+    printf("\tfrom left:\n");
+    printf("\t\tnumber of vehicles: %03d\n", avgLeft->totalVehicles / 100);
+    printf("\t\taverage waiting time: %03d\n", (int)avgWait(avgLeft));
+    printf("\t\tmaximum waiting time: %03d\n", avgLeft->maxWait);
+    printf("\t\tclearance time: %03d\n", avgLeft->timeToClear / 100);
+    printf("\tfrom right:\n");
+    printf("\t\tnumber of vehicles: %03d\n", avgRight->totalVehicles / 100);
+    printf("\t\taverage waiting time: %03d\n", (int)avgWait(avgRight));
+    printf("\t\tmaximum waiting time: %03d\n", avgRight->maxWait);
+    printf("\t\tclearance time: %03d\n", avgRight->timeToClear / 100);
+
+    free(avgLeft);
+    free(avgRight);
+
+    return 0;
 }
 
 int main()
 {
-    STATPAIR *x = (STATPAIR *)runOneSimulation(0.5, 0.5, 3, 3);
-
-    printStats1(x->left);
-    printStats1(x->right);
+    runSimulations(0.5, 0.5, 3, 3);
 
     return 0;
 }

@@ -52,7 +52,7 @@ extern int printStats(QUEUE *queue);
 extern int printStats1(STATS *statistics);
 
 /* Returns average wait time */
-static float avgWait(STATS *statistics);
+extern float avgWait(STATS *statistics);
 
 
 /* Turns pair of stats into statpair struct */
@@ -65,4 +65,4 @@ extern QUEUE *initQueue();
 static NODE *initNode();
 
 /* Initialises empty stats */
-static STATS *initStats();
+extern STATS *initStats();
