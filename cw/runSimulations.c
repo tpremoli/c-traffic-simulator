@@ -1,15 +1,7 @@
 #include <runSimulations.h>
 
-STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime)
+STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime, gsl_rng *r)
 {
-    /* RNG setup */
-    const gsl_rng_type *T;
-    gsl_rng *r;
-    gsl_rng_env_setup();
-    T = gsl_rng_default;
-    r = gsl_rng_alloc(T);
-
-    gsl_rng_set(r, time(0));
 
     /* Initializing each queue */
     QUEUE *leftQueue = initQueue(leftQueue);
@@ -119,21 +111,29 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
     free(leftQueue);
     /* printf("%f\n",gsl_rng_uniform_pos(r)); */
 
-    gsl_rng_free(r);
 
     return results;
 }
 
 int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
 {
-    int i;
+    /* RNG setup */
+    const gsl_rng_type *T;
+    gsl_rng *r;
+    gsl_rng_env_setup();
+    T = gsl_rng_default;
+    r = gsl_rng_alloc(T);
+
+    gsl_rng_set(r, time(0));
 
     STATS *avgLeft = initStats();
     STATS *avgRight = initStats();
 
+    int i;
+
     for (i = 0; i < 100; i++)
     {
-        STATPAIR *currentPair = (STATPAIR *)runOneSimulation(leftFlow, rightFlow, leftTime, rightTime);
+        STATPAIR *currentPair = (STATPAIR *)runOneSimulation(leftFlow, rightFlow, leftTime, rightTime, r);
 
         avgLeft->totalVehicles += currentPair->left->totalVehicles;
         avgLeft->totalWait += currentPair->left->totalWait;
@@ -179,6 +179,8 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
 
     free(avgLeft);
     free(avgRight);
+    gsl_rng_free(r);
+
 
     return 0;
 }
