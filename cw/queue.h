@@ -49,6 +49,7 @@ extern int incrementWaits(QUEUE *queue);
 /* Printing waits and stats (utility) */
 extern int printWaits(QUEUE *queue);
 extern int printStats(QUEUE *queue);
+extern int printStats1(STATS *statistics);
 
 /* Returns average wait time */
 static float avgWait(STATS *statistics);

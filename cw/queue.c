@@ -130,6 +130,16 @@ int printStats(QUEUE *queue)
     queue->statistics->timeToClear);
 }
 
+int printStats1(STATS *statistics)
+{
+    printf("total vehicles: %d, avg wait:%.3f, maxWait:%d, time to clear:%d\n",
+    statistics->totalVehicles,
+    avgWait(statistics),
+    statistics->maxWait,
+    statistics->timeToClear);
+}
+
+
 STATPAIR* createPair(STATS* left, STATS* right){
     STATPAIR *pair = NULL;
     if ((pair = (STATPAIR *)malloc(sizeof(STATPAIR))) == NULL)

@@ -108,7 +108,7 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
         {
             remainingIterations--;
         }
-        else 
+        else
         {
             if (rightQueue->size != 0)
             {
@@ -128,7 +128,6 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
         incrementWaits(rightQueue);
     }
 
-
     /* Get stats into pairs and release memory */
     STATPAIR *results = createPair(leftQueue->statistics, rightQueue->statistics);
 
@@ -140,7 +139,10 @@ STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int ri
 
 int main()
 {
-    runOneSimulation(0.5, 0.5, 3, 3);
+    STATPAIR *x = (STATPAIR *)runOneSimulation(0.5, 0.5, 3, 3);
+
+    printStats1(x->left);
+    printStats1(x->right);
 
     return 0;
 }
