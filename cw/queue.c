@@ -4,6 +4,7 @@ int enqueue(QUEUE *queue)
 {
     NODE *newNode = initNode();
 
+    /* Special case (empty list) */
     if (queue->size == 0)
     {
         queue->firstNode = newNode;
@@ -52,6 +53,8 @@ int dequeue(QUEUE *queue)
 
         return 0;
     }
+
+    /* General case (More than 1 element) */
 
     unsigned int wait = queue->firstNode->waitTime;
 
@@ -113,6 +116,32 @@ int printWaits(QUEUE *queue)
     return 0;
 }
 
+float avgWait(STATS *statistics)
+{
+    return (float)statistics->totalWait / statistics->totalVehicles;
+}
+
+int printStats(QUEUE *queue)
+{
+    printf("total vehicles: %d, avg wait:%.3f, maxWait:%d, time to clear:%d\n",
+    queue->statistics->totalVehicles,
+    avgWait(queue->statistics),
+    queue->statistics->maxWait,
+    queue->statistics->timeToClear);
+}
+
+STATPAIR* createPair(STATS* left, STATS* right){
+    STATPAIR *pair = NULL;
+    if ((pair = (STATPAIR *)malloc(sizeof(STATPAIR))) == NULL)
+    {
+        printf("Out of memory!\n");
+        exit(1);
+    }
+    pair->left = left;
+    pair->right = right;
+    return pair;
+}
+
 QUEUE *initQueue()
 {
     QUEUE *queue = NULL;
@@ -143,19 +172,7 @@ STATS *initStats()
     return statistics;
 }
 
-float avgWait(STATS *statistics)
-{
-    return (float)statistics->totalWait / statistics->totalVehicles;
-}
 
-int printStats(QUEUE *queue)
-{
-    printf("total vehicles: %d, avg wait:%.3f, maxWait:%d, time to clear:%d\n",
-    queue->statistics->totalVehicles,
-    avgWait(queue->statistics),
-    queue->statistics->maxWait,
-    queue->statistics->timeToClear);
-}
 
 NODE *initNode()
 {

@@ -1,6 +1,6 @@
 #include <runSimulations.h>
 
-int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime)
+STATPAIR *runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTime)
 {
     /* RNG setup */
     const gsl_rng_type *T;
@@ -98,33 +98,44 @@ int runOneSimulation(float leftFlow, float rightFlow, int leftTime, int rightTim
                 dequeue(rightQueue);
             }
 
+            /* Iteration over; one step closer to flip */
             timeTillRightRed--;
             timeTillLeftRed--;
         }
 
         /* Step 4: Are cars done arriving? */
-        if (remainingIterations != 0){
+        if (remainingIterations != 0)
+        {
             remainingIterations--;
-        } else{
-            if(rightQueue->size != 0){
+        }
+        else 
+        {
+            if (rightQueue->size != 0)
+            {
+                /* Stat logging (time to empty the queue) */
                 rightQueue->statistics->timeToClear++;
             }
-            if(leftQueue->size != 0){
+            if (leftQueue->size != 0)
+            {
+                /* Stat logging (time to empty the queue) */
                 leftQueue->statistics->timeToClear++;
             }
         }
-        
+
+        /* Incrementing all the time parameters */
         totalIterations++;
         incrementWaits(leftQueue);
         incrementWaits(rightQueue);
-
     }
 
-    printStats(rightQueue);
-    printStats(leftQueue);
 
-    printf("Total iterations = %d\n",totalIterations);
-    return 0;
+    /* Get stats into pairs and release memory */
+    STATPAIR *results = createPair(leftQueue->statistics, rightQueue->statistics);
+
+    free(rightQueue);
+    free(leftQueue);
+
+    return results;
 }
 
 int main()
