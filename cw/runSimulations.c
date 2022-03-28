@@ -185,9 +185,4 @@ int runSimulations(float leftFlow, float rightFlow, int leftTime, int rightTime)
     return 0;
 }
 
-int main()
-{
-    runSimulations(0.15, 0.95, 2, 12);
 
-    return 0;
-}
